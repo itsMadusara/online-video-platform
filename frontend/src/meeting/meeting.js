@@ -18,11 +18,12 @@ const socket = io.connect('http://localhost:8000')
 const modelSocket = io.connect('http://127.0.0.1:5000')
 
 const Meeting = () => {
-
 	const token = localStorage.getItem('accessToken');
 	if(token == null){
 		window.location.href = '/';
 	}
+
+	let identify = localStorage.getItem('accessToken')
 
 	const [callAccepted, setCallAccepted] = useState(false);
 	const [callEnded, setCallEnded] = useState(false);
@@ -45,8 +46,9 @@ const Meeting = () => {
     }, 10000/FPS);
 
 	modelSocket.on('response_back', (data) => {
-		console.log(data);
-		setDowsy(true);
+		if(data == identify){
+			setDowsy(true);
+		}
 	});
 
 	const sendFrame = () => {
@@ -59,7 +61,7 @@ const Meeting = () => {
 		  ctx.drawImage(myVideo.current, 0, 0, canvas.width, canvas.height);
 		  const base64Data = canvas.toDataURL('image/jpeg'); // Convert canvas content to base64
 	
-		  modelSocket.emit('image', base64Data); // Send base64-encoded frame to socket
+		  modelSocket.emit('image', {base64Data,identify}); // Send base64-encoded frame to socket
 		}
 	};
 
@@ -71,7 +73,7 @@ const Meeting = () => {
 			// myVideo.current.srcObject = currentStream;
 		  });
 	
-		socket.on('me', (id) => setMe(id)); 
+		socket.on('me', (id) => setMe(id));
 	
 		socket.on('callUser', ({ from, name: callerName, signal }) => {
 		  setCall({ isReceivingCall: true, from, name: callerName, signal });

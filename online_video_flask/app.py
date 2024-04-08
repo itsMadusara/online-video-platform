@@ -23,7 +23,9 @@ sio = SocketIO(app, cors_allowed_origins="*")
 
 @sio.on('image')
 def image(data_image):
-    base64_data = data_image.split(',')[1]
+    image = data_image['base64Data']
+    print(data_image['identify'])
+    base64_data = image.split(',')[1]
     sbuf = io.StringIO()
     sbuf.write(base64_data)
     b = io.BytesIO(base64.b64decode(base64_data))
@@ -39,7 +41,7 @@ def image(data_image):
     drowsy = prediction[0][0] > 0.5
 
     if drowsy:
-        emit('response_back', 1)
+        emit('response_back', data_image['identify'])
 
 
 # @sio.on('image')
