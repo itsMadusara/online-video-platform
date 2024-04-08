@@ -125,11 +125,14 @@ const Meeting = () => {
 
 	const leaveCall = () => {
 		setCallEnded(true);
-	
 		connectionRef.current.destroy();
-	
 		window.location.reload();
 	};
+
+	socket.on('callEnded', () => {
+		setCallEnded(true);
+		window.location.reload();
+	})
 
 	return (
 		<div>			
