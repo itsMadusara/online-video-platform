@@ -14,10 +14,15 @@ import Box from '@mui/material/Box';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import ResponsiveAppBarLogin from '../navbar/navbarlogin';
 
-const socket = io.connect('http://localhost:5000')
+const socket = io.connect('http://localhost:8000')
 const modelSocket = io.connect('http://127.0.0.1:5000')
 
 const Meeting = () => {
+
+	const token = localStorage.getItem('accessToken');
+	if(token == null){
+		window.location.href = '/';
+	}
 
 	const [callAccepted, setCallAccepted] = useState(false);
 	const [callEnded, setCallEnded] = useState(false);
@@ -34,7 +39,7 @@ const Meeting = () => {
 
 	const FPS = 10;
     setInterval(() => {
-		if(stream && !dowsy){
+		if(stream && !dowsy && callAccepted){
 			sendFrame();
 		}
     }, 10000/FPS);
@@ -244,4 +249,4 @@ const Meeting = () => {
 	)
 }
 
-export default Meeting
+export default Meeting;

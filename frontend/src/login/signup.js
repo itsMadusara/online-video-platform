@@ -14,15 +14,43 @@ import ResponsiveAppBar from '../navbar/navbar';
 const defaultTheme = createTheme();
 
 const SignupForm = () => {
+  const token = localStorage.getItem('accessToken');
+	if(token != null){
+		window.location.href = '/meeting';
+	}
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-        email: data.get('email'),
-        password: data.get('password'),
-        firstName: data.get('firstName'),
-        lastName: data.get('lastName'),
-    });
+
+    const email = data.get('email');
+    const password = data.get('password');
+    const firstName = data.get('firstName');
+    const lastName = data.get('lastName');
+    
+    fetch('http://localhost:8000/register', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "email": email,
+        "password": password,
+        "fname": firstName,
+        "lname": lastName
+      }),
+    }).then(response => {
+      if (response.ok) {
+        console.log(response.json());
+        window.location.href = '/';
+        // return response.json();
+      } else {
+        console.log('Request failed: ' + response.statusText);
+      }
+    })
+
+
   };
 
   return (

@@ -1,0 +1,23 @@
+POST http://localhost:8000/register 
+Content-Type: application/json
+
+{
+"fname" : "Sachini", "lname": "Muthugala", "email" : "sachini@gmail.com", "password" : "example123"
+
+}
+
+### 
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+"email" : "sachini@gmail.com", "password" : "example123"
+}
+
+### POST 
+http://localhost:8000/logout
+
+### POST 
+http://localhost:8000/authToken
+Content-Type: application/json
+Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJTYWNoaW5pIiwidXNlcl9lbWFpbCI6InNhY2hpbmlAZ21haWwuY29tIiwiaWF0IjoxNzEyNjAwODQ1LCJleHAiOjE3MTM4MTA0NDV9.5A8mNrd-16CVvTjHOwYH1pxhNEl2AaIKU9J_TNEkyS0"

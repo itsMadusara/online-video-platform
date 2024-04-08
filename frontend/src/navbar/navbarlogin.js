@@ -25,6 +25,11 @@ const ResponsiveAppBarLogin = () => {
         setAnchorElNav(null);
     };
 
+    function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+    }
+
     return (
         <ThemeProvider theme={defaultTheme}>
             <AppBar position="static">
@@ -101,7 +106,7 @@ const ResponsiveAppBarLogin = () => {
                     LOGO
                 </Typography>
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex', justifyContent: 'flex-end' } }}>
-                    <Button component={Link} to="/" sx={{ my: 2, color: 'white', display: 'block' }}>
+                    <Button sx={{ my: 2, color: 'white', display: 'block' }} onClick={logout}>
                         Logout
                     </Button>
                 </Box>

@@ -1,67 +1,30 @@
-// const express = require("express");
-// const http = require("http");
-// const app = express();
-// const server = http.createServer(app);
-// const cors = require("cors");
+import express, {json} from "express";
+import cors from "cors";
+import * as http from 'http';
+import dotenv from "dotenv";
 
-// const io = require("socket.io")(server, {
-// 	cors: {
-// 		origin: "*",
-// 		methods: [ "GET", "POST" ]
-// 	}
-// });
-
-// app.use(cors());
-
-// io.on("connection", (socket) => {
-// 	socket.emit("me", socket.id);
-// 	console.log('socket.id:', socket.id);
-
-// 	socket.on("disconnect", () => {
-// 		socket.broadcast.emit("callEnded")
-// 	});
-
-// 	socket.on("callUser", ({ userToCall, signalData, from, name }) => {
-// 		io.to(userToCall).emit("callUser", { signal: signalData, from, name });
-// 	});
-
-// 	socket.on("answerCall", (data) => {
-// 		io.to(data.to).emit("callAccepted", data.signal)
-// 	});
-// });
-
-// // const socketRoutes = require("./routes/meeting");
-
-// // Mount the Socket.io route on /socket.io
-// // app.use("/meet", socketRoutes(server));
-
-// app.get("/", (req, res) => {
-//     res.send("Server is running.");
-// });
-
-// const PORT = process.env.PORT || 5000;
-// server.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}`);
-// });
-
-const express = require("express");
-const http = require("http");
 const app = express();
-const server = http.createServer(app);
-const cors = require("cors");
-
-const initializeSocket = require("./routes/meeting");
-
 app.use(cors());
+app.use(json())
+const PORT = process.env.PORT || 8000;
+dotenv.config();
 
-// Initialize socket.io and pass the HTTP server instance
+import userReg from "./routes/authentication/user-register.js";
+import userLogin from "./routes/authentication/user-login.js";
+import userLogout from "./routes/authentication/user-logout.js";
+import authToken from "./routes/authentication/authenticate-token.js" 
+
+import initializeSocket from "./routes/meeting.js";
+
+const server = http.createServer(app);
 const io = initializeSocket(server);
 
-app.get("/", (req, res) => {
-    res.send("Server is running.");
-});
+app.use("/register", userReg);
+app.use("/login", userLogin);
+app.use("/logout", userLogout);
+app.use("/authToken", authToken);
 
-const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

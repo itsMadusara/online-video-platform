@@ -15,12 +15,43 @@ import ResponsiveAppBar from '../navbar/navbar';
 const defaultTheme = createTheme();
 
 const SigninForm = () => {
+  const token = localStorage.getItem('accessToken');
+	if(token != null){
+		window.location.href = '/meeting';
+	}
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-          email: data.get('email'),
-          password: data.get('password'),
+
+        const email = data.get('email');
+        const password = data.get('password');
+
+        fetch('http://localhost:8000/login', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "email": email,
+            "password": password
+          }),
+        }).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Request failed: ' + response.statusText);
+          }
+        }).then(async (data)=>{
+
+          console.log(data['tokens']['accessToken'])
+          const accessToken = data['tokens']['accessToken']
+          localStorage.setItem('accessToken', accessToken);
+          window.location.href = '/meeting';
+
+        }).catch(error => {
+          console.error('Fetch error:', error);
         });
     };
     
