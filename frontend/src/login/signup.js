@@ -28,7 +28,7 @@ const SignupForm = () => {
     const firstName = data.get('firstName');
     const lastName = data.get('lastName');
     
-    fetch('http://localhost:8000/register', {
+    fetch(process.env.REACT_APP_BACKEND+'/register', {
       method: 'POST',
       headers: {
         Accept: 'application/json',

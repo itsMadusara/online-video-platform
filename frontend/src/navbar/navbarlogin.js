@@ -82,7 +82,7 @@ const ResponsiveAppBarLogin = () => {
                     }}
                     >
                     <MenuItem>
-                        <Typography component={Link} to="/" textAlign="center"> 
+                        <Typography component={Link} to="/" textAlign="center" onClick={logout}> 
                             Logout
                         </Typography> 
                     </MenuItem>

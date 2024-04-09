@@ -14,8 +14,8 @@ import Box from '@mui/material/Box';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import ResponsiveAppBarLogin from '../navbar/navbarlogin';
 
-const socket = io.connect('http://localhost:8000')
-const modelSocket = io.connect('http://127.0.0.1:5000')
+const socket = io.connect(process.env.REACT_APP_BACKEND)
+const modelSocket = io.connect(process.env.REACT_APP_MODEL)
 
 const Meeting = () => {
 	const token = localStorage.getItem('accessToken');
