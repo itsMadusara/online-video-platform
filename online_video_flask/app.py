@@ -48,6 +48,7 @@ sio = SocketIO(app, cors_allowed_origins="*")
 def image(data_image):
     image = data_image['base64Data']
     print(data_image['identify'])
+    print(data_image['time'])
     flag=0
 
     def eye_aspect_ratio(eye):

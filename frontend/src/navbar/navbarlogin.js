@@ -49,7 +49,7 @@ const ResponsiveAppBarLogin = () => {
                     textDecoration: 'none',
                     }}
                 >
-                    LOGO
+                    <img src={window.location.origin + '/Logo.png'} width={60}/>
                 </Typography>
 
                 <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>

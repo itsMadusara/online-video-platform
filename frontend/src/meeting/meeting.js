@@ -6,16 +6,26 @@ import Peer from "simple-peer"
 import io from "socket.io-client"
 import { Grid, Typography, Paper, Container } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { Phone, PhoneDisabled } from '@mui/icons-material';
+import { PhoneDisabled } from '@mui/icons-material';
+import VideocamIcon from '@mui/icons-material/Videocam';
 
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import ResponsiveAppBarLogin from '../navbar/navbarlogin';
+import './Meeting.css'
 
 const socket = io.connect(process.env.REACT_APP_BACKEND)
 const modelSocket = io.connect(process.env.REACT_APP_MODEL)
+
+let constraints = {
+	video:{
+		width:{min:640, ideal:1920, max:1920},
+		height:{min:480, ideal:1080, max:1080},
+	},
+	audio:true
+}
 
 const Meeting = () => {
 	const token = localStorage.getItem('accessToken');
@@ -38,6 +48,37 @@ const Meeting = () => {
 	const userVideo = useRef(null);
 	const connectionRef = useRef(null);
 
+	function videoButtonOff() {
+		// Create a canvas
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+		canvas.width = 640;
+		canvas.height = 480;
+	
+		// Set black background on the canvas
+		context.fillStyle = '#000000'; // Black color
+		context.fillRect(0, 0, canvas.width, canvas.height);
+	
+		// Convert canvas to a black color stream
+		const blackStream = canvas.captureStream();
+		
+		// Set the black color stream as srcObject for myVideo
+		myVideo.current.srcObject = blackStream;
+
+		if (connectionRef.current) {
+			const blackTrack = blackStream.getVideoTracks()[0];
+			connectionRef.current.replaceTrack(stream.getVideoTracks()[0], blackTrack, stream);
+		}
+	}
+
+	function videoButtonOn() {
+		myVideo.current.srcObject = stream;
+		if (connectionRef.current) {
+			const originalVideoTrack = stream.getVideoTracks()[0];
+			connectionRef.current.replaceTrack(myVideo.current.srcObject.getVideoTracks()[0], originalVideoTrack, stream);
+		}
+	}
+
 	const FPS = 10;
     setInterval(() => {
 		if(stream && !dowsy && callAccepted){
@@ -46,7 +87,7 @@ const Meeting = () => {
     }, 10000/FPS);
 
 	modelSocket.on('response_back', (data) => {
-		if(data == identify){
+		if(data === identify){
 			setDowsy(true);
 		}
 	});
@@ -61,15 +102,17 @@ const Meeting = () => {
 		  ctx.drawImage(myVideo.current, 0, 0, canvas.width, canvas.height);
 		  const base64Data = canvas.toDataURL('image/jpeg'); // Convert canvas content to base64
 	
-		  modelSocket.emit('image', {base64Data,identify}); // Send base64-encoded frame to socket
+		  const date = new Date();
+		  const time = date.getHours();
+
+		  modelSocket.emit('image', {base64Data,identify,time}); // Send base64-encoded frame to socket
 		}
 	};
 
 	useEffect(() => {
-		navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+		navigator.mediaDevices.getUserMedia(constraints)
 		  .then((currentStream) => {
 			setStream(currentStream);
-	
 			// myVideo.current.srcObject = currentStream;
 		  });
 	
@@ -209,43 +252,60 @@ const Meeting = () => {
 				</div>
 			)}
 
-			<Grid container spacing={2} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh', paddingTop: '20px' }}>
-				{stream && (
+			<Grid 
+				container 
+				spacing={2} 
+				style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh', paddingTop: '20px' }}
+				className={`${callAccepted && !callEnded && call ? "videos" : ""}`}
+			>
+				{stream && callAccepted && !callEnded && call &&(
 				<Paper>
 					<Grid item xs={12} md={6}>
 						<video
 							ref={myVideo}
-								playsInline
-								muted
-								autoPlay
+							playsInline
+							muted
+							autoPlay
+							className={`video-preview ${callAccepted && !callEnded && call ? "video-player smallFrame" : "video-preview"}`}
 						/>
 					</Grid>
 				</Paper>
 				)}
 				{callAccepted && !callEnded && call &&(
-					<Paper>
-						<Grid item xs={12} md={6}>
-							<video playsInline ref={userVideo} autoPlay />
-						</Grid>
+					<Paper className='video-player'>
+						<video 
+							playsInline 
+							ref={userVideo} 
+							autoPlay 
+							className={"user2"}
+						/>
 					</Paper>
 				)}
 			</Grid>
 
 			{ callAccepted && (
 				<div>
-					{ dowsy && (<Alert severity="warning" onClose={() => {setDowsy(false)}}>
+					{ dowsy && (
+						<Alert severity="warning" onClose={() => {setDowsy(false)}}>
 							You are {dowsy ? 'Dowsy' : 'Not Dowsy'}
-					</Alert>)}
+						</Alert>
+					)}
 
-					<div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-						{ callAccepted && !callEnded ? (
-							<Button variant="contained" color="secondary" startIcon={<PhoneDisabled fontSize="large" />} onClick={leaveCall}>
-								Hang Up
-							</Button>
-						) : (
-							<Button variant="contained" color="primary" startIcon={<Phone fontSize="large" />} fullWidth onClick={() => callUser(idToCall)}>
-							Call
-							</Button>
+					<div className='controls'>
+						{ callAccepted && !callEnded && (
+							<Grid>
+								<Button variant="contained" color="secondary" startIcon={<PhoneDisabled fontSize="large" />} onClick={leaveCall}>
+									Hang Up
+								</Button>
+
+								<Button variant="contained" color="primary" startIcon={<VideocamIcon fontSize="large" />} onClick={videoButtonOn}>
+									Video On
+								</Button>
+
+								<Button variant="contained" color="primary" startIcon={<VideocamIcon fontSize="large" />} onClick={videoButtonOff}>
+									Video Off
+								</Button>
+							</Grid>
 						)}
 					</div>
 				</div>

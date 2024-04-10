@@ -48,7 +48,7 @@ const SigninForm = () => {
           console.log(data['tokens']['accessToken'])
           const accessToken = data['tokens']['accessToken']
           localStorage.setItem('accessToken', accessToken);
-          window.location.href = '/meeting';
+          window.location.href = '/meetHome';
 
         }).catch(error => {
           console.error('Fetch error:', error);
